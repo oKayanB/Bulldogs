@@ -91,6 +91,21 @@
     .select-all {
       margin-bottom: 10px;
     }
+
+    .reset-button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #ff0000;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .reset-button:hover {
+      background-color: #d40000;
+    }
   </style>
 </head>
 <body>
@@ -174,6 +189,9 @@
       <p>Total sem desconto: <span id="total-value">0</span></p>
       <p>Total com desconto: <span id="total-discounted-value">0</span></p>
     </div>
+
+    <button class="reset-button" onclick="resetCheckboxes()">Resetar Seleções</button>
+
   </div>
 
   <!-- botão para ir para o topo -->
@@ -237,138 +255,145 @@
         { nome: 'Para-choque Traseiro 1 a 6', valor: 6000 },
         { nome: 'Para-choque Dianteiro 7 a 12', valor: 12000 },
         { nome: 'Para-choque Traseiro 7 a 12', valor: 12000 },
-        { nome: 'Saias 1 a 7', valor: 4000 },
-        { nome: 'Saias 7 a 14', valor: 8000 },
-        { nome: 'Escapamento 1 a 8', valor: 4000 },
-        { nome: 'Escapamento 9 a 16', valor: 8000 },
-        { nome: 'Para-lama Dianteiro 1 a 7', valor: 4000 },
-        { nome: 'Para-lama Traseiro 1 a 7', valor: 4000 },
-        { nome: 'Para-lama Ddianteiro 8 a 14', valor: 8000 },
-        { nome: 'Para-lama Traseiro 8 a 14', valor: 8000 },
-        { nome: 'Chasssi', valor: 2500 },
-        { nome: 'Porta', valor: 12500 },
-        { nome: 'Capa de farol', valor: 6500 },
-        { nome: 'Grelha', valor: 4000 },
-        { nome: 'Capo 1 a 9', valor: 5000 },
-        { nome: 'Capo 10 a 20', valor: 10000 },
-        { nome: 'Teto 1 a 9', valor: 6000 },
-        { nome: 'Teto 10 a 19', valor: 12000 },
+        { nome: 'Saias 1 a 5', valor: 4000 },
+        { nome: 'Saias 6 a 10', valor: 8000 },
+        { nome: 'Exaustor 1 a 5', valor: 4000 },
+        { nome: 'Exaustor 6 a 10', valor: 8000 },
+        { nome: 'Capô 1 a 7', valor: 8000 },
+        { nome: 'Capô 8 a 17', valor: 16000 },
+        { nome: 'Capô 18 a 22', valor: 24000 },
+        { nome: 'Turbo 1 a 3', valor: 15000 },
+        { nome: 'Turbo 4 a 5', valor: 40000 },
+        { nome: 'Escapamento 1 a 5', valor: 8000 },
+        { nome: 'Escapamento 6 a 8', valor: 16000 },
       ],
       [
-        { nome: 'Motor I', valor: 37000 },
-        { nome: 'Motor II', valor: 42000 },
-        { nome: 'Motor III', valor: 48000 },
-        { nome: 'Motor IV', valor: 53000 },
-        { nome: 'Motor V', valor: 58000 },
-        { nome: 'Freios I', valor: 30000 },
-        { nome: 'Freios II', valor: 34000 },
-        { nome: 'Freios III', valor: 38000 },
-        { nome: 'Freios IV', valor: 42000 },
-        { nome: 'Transmissão I', valor: 38000 },
-        { nome: 'Transmissão II', valor: 42000 },
-        { nome: 'Transmissão III', valor: 45000 },
-        { nome: 'Transmissão IV', valor: 50000 },
-        { nome: 'Suspensão I', valor: 38000 },
-        { nome: 'Suspensão II', valor: 45000 },
-        { nome: 'Suspensão III', valor: 52000 },
-        { nome: 'Suspensão IV', valor: 60000 },
-        { nome: 'Suspensão V', valor: 70000 },
-        { nome: 'Blindagem 20%', valor: 80000 },
-        { nome: 'Blindagem 40%', valor: 100000 },
-        { nome: 'Blindagem 60%', valor: 120000 },
-        { nome: 'Blindagem 80%', valor: 140000 },
-        { nome: 'Blindagem 100%', valor: 160000 },
-        { nome: 'Turbo', valor: 20000 },
-      ],
+        { nome: 'Nitro Tipo 1', valor: 30000 },
+        { nome: 'Nitro Tipo 2', valor: 60000 },
+        { nome: 'Nitro Tipo 3', valor: 100000 },
+        { nome: 'Nitro Tipo 4', valor: 140000 },
+      ]
     ];
 
-    const discountData = [
-      { nome: 'River Airways', porcentagem: 30 },
-      { nome: 'Oasis', porcentagem: 20 },
-      { nome: 'NULO', porcentagem: 10 },
-
+    const discountsData = [
+      { empresa: 'River Airways', porcentagem: 30 },
+      { empresa: 'Oasis', porcentagem: 20 },
     ];
 
-    const tables = document.querySelectorAll('.item-list');
-    const discountTable = document.querySelector('.discount-list');
-    const totalValue = document.getElementById('total-value');
-    const totalDiscountedValue = document.getElementById('total-discounted-value');
-    const scrollToTopButton = document.querySelector('.scroll-to-top');
+    function createTableRow(item, valor) {
+      const row = document.createElement('tr');
+      const itemCell = document.createElement('td');
+      const valorCell = document.createElement('td');
+      const checkboxCell = document.createElement('td');
+      const checkbox = document.createElement('input');
 
-    function initTables() {
-      tables.forEach((table, tableIndex) => {
-        const tableData = tablesData[tableIndex];
-        tableData.forEach((item, index) => {
-          const row = table.insertRow();
-          row.innerHTML = `
-            <td>${item.nome}</td>
-            <td>${item.valor}</td>
-            <td style="text-align: right;"><input type="checkbox" id="item${tableIndex}-${index}" data-valor="${item.valor}" onchange="updateTotal()"></td>
-          `;
+      itemCell.textContent = item;
+      valorCell.textContent = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+      checkbox.type = 'checkbox';
+      checkbox.className = 'item-checkbox';
+      checkbox.dataset.valor = valor;
+
+      checkbox.addEventListener('change', updateTotal);
+
+      checkboxCell.appendChild(checkbox);
+      row.appendChild(itemCell);
+      row.appendChild(valorCell);
+      row.appendChild(checkboxCell);
+
+      return row;
+    }
+
+    function populateTables() {
+      const tables = document.querySelectorAll('.item-list');
+
+      tables.forEach((table, index) => {
+        const data = tablesData[index];
+
+        data.forEach(item => {
+          const row = createTableRow(item.nome, item.valor);
+          table.appendChild(row);
         });
       });
+    }
 
-      // Inicializa a tabela de descontos
-      discountData.forEach((item, index) => {
-        const row = discountTable.insertRow();
-        row.innerHTML = `
-          <td>${item.nome}</td>
-          <td>${item.porcentagem}%</td>
-          <td style="text-align: right;"><input type="checkbox" class="discount-checkbox" id="discount${index}" onchange="updateTotal()"></td>
-        `;
+    function populateDiscountTable() {
+      const discountTable = document.querySelector('.discount-list');
+
+      discountsData.forEach(discount => {
+        const row = document.createElement('tr');
+        const empresaCell = document.createElement('td');
+        const porcentagemCell = document.createElement('td');
+        const checkboxCell = document.createElement('td');
+        const checkbox = document.createElement('input');
+
+        empresaCell.textContent = discount.empresa;
+        porcentagemCell.textContent = discount.porcentagem + '%';
+
+        checkbox.type = 'checkbox';
+        checkbox.className = 'discount-checkbox';
+        checkbox.dataset.porcentagem = discount.porcentagem;
+
+        checkbox.addEventListener('change', updateTotal);
+
+        checkboxCell.appendChild(checkbox);
+        row.appendChild(empresaCell);
+        row.appendChild(porcentagemCell);
+        row.appendChild(checkboxCell);
+
+        discountTable.appendChild(row);
       });
     }
 
     function updateTotal() {
+      const checkboxes = document.querySelectorAll('.item-checkbox');
+      const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
       let total = 0;
-      tables.forEach((table, tableIndex) => {
-        const tableData = tablesData[tableIndex];
-        tableData.forEach((item, index) => {
-          const checkbox = document.getElementById(`item${tableIndex}-${index}`);
-          if (checkbox.checked) {
-            total += item.valor;
-          }
-        });
-      });
-      totalValue.textContent = total;
+      let totalDiscounted = 0;
+      let totalDescontos = 0;
 
-      // calcular o total com desconto
-      let totalDiscounted = total;
-      const selectedDiscounts = document.querySelectorAll('.discount-checkbox:checked');
-      selectedDiscounts.forEach((discountCheckbox) => {
-        const discountIndex = Array.from(discountCheckbox.parentElement.parentElement.parentElement.rows).indexOf(discountCheckbox.parentElement.parentElement);
-        const discountPercentage = discountData[discountIndex].porcentagem;
-        totalDiscounted -= (total * discountPercentage / 100);
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const valor = parseFloat(checkbox.dataset.valor);
+          total += valor;
+        }
       });
 
-      totalDiscountedValue.textContent = totalDiscounted;
-
-      // mostrar ou ocultar o botão "Scroll to Top" baseado na posição da página
-      if (window.scrollY > 200) {
-        scrollToTopButton.style.display = 'block';
-      } else {
-        scrollToTopButton.style.display = 'none';
-      }
-    }
-
-    function toggleAllDiscounts(checkbox) {
-      const allDiscountCheckboxes = document.querySelectorAll('.discount-checkbox');
-      allDiscountCheckboxes.forEach((discountCheckbox) => {
-        discountCheckbox.checked = checkbox.checked;
+      discountCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          totalDescontos += parseFloat(checkbox.dataset.porcentagem);
+        }
       });
-      updateTotal();
+
+      totalDiscounted = total * (1 - totalDescontos / 100);
+
+      document.getElementById('total-value').textContent = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      document.getElementById('total-discounted-value').textContent = totalDiscounted.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     function scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    window.onload = function() {
-      initTables();
+    function resetCheckboxes() {
+      const checkboxes = document.querySelectorAll('.item-checkbox, .discount-checkbox');
+      checkboxes.forEach(checkbox => checkbox.checked = false);
       updateTotal();
+    }
 
-      window.addEventListener('scroll', updateTostal);
-    };
+    window.addEventListener('scroll', function() {
+      const scrollToTopButton = document.querySelector('.scroll-to-top');
+      if (window.scrollY > 300) {
+        scrollToTopButton.style.display = 'block';
+      } else {
+        scrollToTopButton.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      populateTables();
+      populateDiscountTable();
+    });
   </script>
 </body>
 </html>
